@@ -161,8 +161,46 @@ function makeWord(lettersObject) {
  *    sellTickets([25, 25, 50]) => true
  *    sellTickets([25, 100]) => false (The seller does not have enough money to give change.)
  */
-function sellTickets(/* queue */) {
-  throw new Error('Not implemented');
+function sellTickets(queue) {
+  const seller = {
+    money25: 0,
+    money50: 0,
+    money100: 0,
+    isCanSell(pay) {
+      const change = pay - 25;
+      if (change === 0) {
+        this.addMoney(pay);
+        return true;
+      }
+      if (change / 25 === 3 && this.money25 !== 0 && this.money50 !== 0) {
+        this.addMoney(pay);
+        this.removeMoney(25);
+        this.removeMoney(50);
+        return true;
+      }
+      if (change / 25 === 3 && this.money25 >= 3) {
+        this.addMoney(pay);
+        this.removeMoney(25, 3);
+        return true;
+      }
+      if (change / 25 === 1 && this.money25 !== 0) {
+        this.addMoney(pay);
+        this.removeMoney(25);
+        return true;
+      }
+      return false;
+    },
+    addMoney(nominal) {
+      this[`money${nominal}`] += 1;
+    },
+    removeMoney(nominal, times = 1) {
+      this[`money${nominal}`] -= 1 * times;
+    },
+  };
+  for (let index = 0; index < queue.length; index += 1) {
+    if (!seller.isCanSell(queue[index])) return false;
+  }
+  return true;
 }
 
 /**
